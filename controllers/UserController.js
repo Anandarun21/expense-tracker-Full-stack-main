@@ -29,19 +29,24 @@ const login = async (req, res) => {
 
     try {
         // Check if user exists
-        const user = await db.query('SELECT * FROM users WHERE email = ? AND password = ?', [email, password]);
-        if (user.length === 0) {
-            return res.status(401).json({ success: false, message: "Invalid email or password" });
+        const users = await db.query('SELECT * FROM users WHERE email = ?', [email]);
+        if (users.length === 0) {
+            return res.status(404).json({ success: false, message: "User not found" });
         }
 
-        // Respond with success message
-        res.status(200).json({ success: true, message: "Login successful" });
+        // Check if password matches
+        const user = users[0];
+        if (user.password !== password) {
+            return res.status(401).json({ success: false, message: "User not authorized" });
+        }
+
+        // Password matches, send success message
+        res.status(200).json({ success: true, message: "User login successful" });
     } catch (error) {
         console.error("Error logging in user:", error);
         res.status(500).json({ success: false, message: "Internal server error" });
     }
 };
-
 module.exports = {
     signup,
     login
