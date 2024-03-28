@@ -7,7 +7,7 @@ document.getElementById("signupForm").addEventListener("submit", function(event)
     formData.append("password", document.getElementById("password").value.trim());
 
     // Make a POST request to the backend server
-    fetch("https://your-backend-server-url/signup", {
+    fetch("/signup", {
         method: "POST",
         body: formData
     })
@@ -19,8 +19,15 @@ document.getElementById("signupForm").addEventListener("submit", function(event)
     })
     .then(data => {
         // Handle successful response from the server
-        alert("Signup successful!");
-        console.log(data); // Log the response from the server (if needed)
+        if (data.success) {
+            // User signed up successfully
+            document.getElementById("message").innerText = "Signup successful!";
+            document.getElementById("message").className = "success";
+        } else {
+            // User already exists
+            document.getElementById("message").innerText = "User already exists";
+            document.getElementById("message").className = "error";
+        }
     })
     .catch(error => {
         // Handle errors

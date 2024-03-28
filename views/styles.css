@@ -6,10 +6,10 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-color: #f4f4f4;
+    background-color: #161616;
 }
 form {
-    background-color: #fff;
+    background-color: #bca9a9;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -26,10 +26,10 @@ input[type="submit"] {
     box-sizing: border-box;
 }
 input[type="submit"] {
-    background-color: #4caf50;
+    background-color: #000000;
     color: #fff;
     cursor: pointer;
 }
 input[type="submit"]:hover {
-    background-color: #45a049;
+    background-color: #004d53;
 }
