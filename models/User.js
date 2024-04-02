@@ -1,30 +1,46 @@
-const db = require("../util/database");
+const sequelize = require('../util/database');
+const {DataTypes} = require('sequelize');
+const queryInterface = sequelize.getQueryInterface();
 
-class User {
-    constructor(name, email, password) {
-        this.name = name;
-        this.email = email;
-        this.password = password;
-    }
-
-    static async findByEmail(email) {
-        try {
-            const users = await db.query('SELECT * FROM users WHERE email = ?', [email]);
-            return users.length > 0 ? new User(users[0].name, users[0].email, users[0].password) : null;
-        } catch (error) {
-            console.error("Error finding user by email:", error);
-            throw error;
+const User = sequelize.define('User', {
+    id: {
+        type:DataTypes.STRING,
+        allowNull:false,
+        unique:true,
+        validate: {
+            isEmail:true
+        },
+        primaryKey:true
+    },
+    firstName: {
+        type:DataTypes. STRING,
+        allowNull:false
+    },
+    lastName: {
+        type:DataTypes.STRING,
+        allowNull:false
+    },
+    email: {
+        type:DataTypes.STRING,
+        allowNull:false,
+        validate: {
+            isEmail:true
         }
+    },
+    password: {
+        type: DataTypes.STRING,
+        allowNull:false
+    },
+    isPremiumUser: {
+        type:DataTypes.BOOLEAN,
+        defaultValue:false,
+        allowNull:false
+    },
+    totalExpense: {
+        type:DataTypes.INTEGER,
+        defaultValue:0,
+        allowNull:true
     }
-
-    async save() {
-        try {
-            await db.query('INSERT INTO users (name, email, password) VALUES (?, ?, ?)', [this.name, this.email, this.password]);
-        } catch (error) {
-            console.error("Error saving user:", error);
-            throw error;
-        }
-    }
-}
+});
 
 module.exports = User;
