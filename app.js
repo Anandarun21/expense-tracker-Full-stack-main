@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
-const { signup, login } = require("./controllers/UserController");
+const { signup, login } = require("./controllers/user");
 const authRoutes = require("./routes/authRoutes");
 
 // Middleware to parse JSON bodies
