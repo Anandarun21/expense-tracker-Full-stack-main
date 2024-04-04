@@ -1,37 +1,160 @@
-document.getElementById("signupForm").addEventListener("submit", function(event) {
-    event.preventDefault(); // Prevent the default form submission behavior
+const topNav = document.getElementById("myTopnav", toggleNav);
+const closeSpans = document.getElementsByClassName("close");
+const modals = document.getElementsByClassName("modal");
+const topNavCenter = document.querySelector(".topnav-center");
+const navLinks = topNavCenter.querySelectorAll("a");
 
-    var formData = new FormData();
-    formData.append("name", document.getElementById("name").value.trim());
-    formData.append("email", document.getElementById("email").value.trim());
-    formData.append("password", document.getElementById("password").value.trim());
+const signUpDiv = document.getElementById("signup-form-div");
+const signUpBtn = document.getElementById("signUp-btn");
+const signUpSubmitBtn = document.getElementById("signUp-Submit-Btn");
+const signUpForm = document.getElementById("signup-form");
+const newPassword = document.getElementById("newPassword");
+const confirmPassword = document.getElementById("confirmPassword");
+const firstName = document.getElementById("firstName");
+const lastName = document.getElementById("lastName");
+const email = document.getElementById("email");
 
-    // Make a POST request to the backend server
-    fetch("/signup", {
-        method: "POST",
-        body: formData
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error("Network response was not ok");
-        }
-        return response.json();
-    })
-    .then(data => {
-        // Handle successful response from the server
-        if (data.success) {
-            // User signed up successfully
-            document.getElementById("message").innerText = "Signup successful!";
-            document.getElementById("message").className = "success";
-        } else {
-            // User already exists
-            document.getElementById("message").innerText = "User already exists";
-            document.getElementById("message").className = "error";
-        }
-    })
-    .catch(error => {
-        // Handle errors
-        console.error("There was a problem with the signup request:", error);
-        alert("Signup failed. Please try again later.");
-    });
+
+const leaderBoardDiv = document.getElementById("leaderBoard-div");
+
+signUpBtn.addEventListener("click", () => {
+    signUpDiv.style.display = "block";
+}); 
+
+loginBtn.addEventListener("click", ()=> {
+    loginDiv.style.display = "block";
 });
+
+forgotPasswordBtn.addEventListener("click", ()=> {
+    loginDiv.style.display = "none";
+    forgotPasswordDiv.style.display = "block";
+});
+
+window.onclick = function(event) {
+    for (let i = 0; i < modals.length; i++) {
+        if (event.target === modals[i]) {
+            signUpDiv.style.display = "none";
+            loginDiv.style.display = "none";
+            expenseFormDiv.style.display = "none";
+            expenseForm.style.display="none";
+            forgotPasswordDiv.style.display='none';
+        }
+    }
+};
+
+function toggleNav() {
+    if (topNav.classList.contains("responsive")) {
+        topNav.classList.remove("responsive");
+    } else {
+        topNav.classList.add("responsive");
+    }
+}
+
+function signUpFormValidation() {
+    if ( newPassword.value.trim() != '' && confirmPassword.value.trim() != '' && newPassword.value === confirmPassword.value ) {
+        signUpSubmitBtn.disabled = false;
+    } else {
+        signUpSubmitBtn.disabled = true;
+    }
+}
+
+newPassword.addEventListener("input", signUpFormValidation);
+confirmPassword.addEventListener("input", signUpFormValidation);
+
+signUpForm.addEventListener("submit" , (e)=> {
+    e.preventDefault();
+    const user = {
+        firstName: firstName.value,
+        lastName: lastName.value,
+        email: email.value,
+        password: newPassword.value
+    }
+    registerUser(user);
+});
+
+loginForm.addEventListener("submit", (e)=> {
+    e.preventDefault();
+    const user = {
+        email : loginEmail.value,
+        password: loginPassword.value
+    };
+    loginUser(user);
+});
+
+async function registerUser(user)  {
+    try {
+        const response = await fetch(`/user/register`, {
+            method: 'POST',
+            headers:{
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify( {
+                firstName : user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+                password: user.password,
+            }),
+        });
+
+        if(response.status == 201) {
+            console.log("New User Added");
+            signUpDiv.style.display = "none";
+            loginDiv.style.display = "block";
+        } else if (response.status == 200){
+            console.log("user Already exits");
+            alert("User with same email id already Exits !!!");
+        }
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+const logOutBtn = document.createElement("button");
+logOutBtn.textContent = "Logout";
+logOutBtn.classList.add("log");
+
+const buyPremiumBtn = document.createElement("button");
+buyPremiumBtn.textContent = "Buy Premium";
+buyPremiumBtn.classList.add("reg");
+
+const addExpensesBtn = document.createElement("button");
+addExpensesBtn.textContent = "Add Expenses";
+addExpensesBtn.classList.add("log");
+
+async function loginUser(user) {
+    try {
+        const response = await fetch(`/user/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email: user.email,
+                password: user.password,
+            }),
+        });
+
+        if (response.status === 200) {
+            const data = await response.json();
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('isLoggedIn', true);
+            location.reload();
+            localStorage.setItem('isPremiumUser', data.isPremiumUser);
+            toggleUI();
+
+        } else if (response.status === 401) {
+            const error = await response.json();
+            console.log(error);
+            alert("Incorrect Password");
+        } else if (response.status === 404) {
+            const error = await response.json();
+            console.log(error);
+            alert("No user Found");
+        }
+        
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+window.addEventListener("load", ()=> toggleUI());
